@@ -6,6 +6,7 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
+    "importsNotUsedAsValues": "remove",
     "paths": {
       "@/*": ["./src/*"]
     }

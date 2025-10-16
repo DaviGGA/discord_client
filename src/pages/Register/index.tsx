@@ -3,9 +3,47 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { useAuth } from "@/hooks/useAuth"
+import { type UserRegister } from "@/types/user"
 import { MessageCircle } from "lucide-react"
+import { useState } from "react"
+import { Link, useNavigate } from "react-router";
+import { toast } from "sonner"
 
 export function Register() {
+  const { signup } = useAuth();
+  const navigate = useNavigate()
+  const [userRegister, setUserRegister] = useState<UserRegister>({
+    email: "",
+    password: "",
+    confirmPassword: ""
+  })
+  
+  async function onSignupClick() {
+    const { password, confirmPassword } = userRegister;
+    const passwordMismatch = password !== confirmPassword;
+
+    if (passwordMismatch) {
+      return toast.error(
+        "Password Error", { 
+          description: "The passwords does not match.",
+          position: "top-center",
+        }
+      )
+    }
+    
+    try {
+      await signup(userRegister);
+      toast.success(
+        "Account successfully created.", {
+          description: "Welcome to the platform!"
+        }
+      )
+      navigate("/login")
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -18,7 +56,10 @@ export function Register() {
               </div>
               <div>
                 <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-                <CardDescription className="mt-2">Join the conversation! Connect with friends and explore communities that matter to you.</CardDescription>
+                <CardDescription className="mt-2">
+                  Join the conversation! Connect with friends and 
+                  explore communities that matter to you.
+                </CardDescription>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -29,6 +70,9 @@ export function Register() {
                   </Label>
                   <Input
                     id="email"
+                    value={userRegister.email}
+                    onChange={e => setUserRegister(
+                    {...userRegister, email: e.target.value})}
                     type="email"
                     required
                   />
@@ -40,6 +84,9 @@ export function Register() {
                   <Input
                     id="password"
                     type="password"
+                    value={userRegister.password}
+                    onChange={e => setUserRegister(
+                    {...userRegister, password: e.target.value})}
                     required
                   />
                 </div>
@@ -50,17 +97,27 @@ export function Register() {
                   <Input
                     id="confirmPassword"
                     type="password"
+                    value={userRegister.confirmPassword}
+                    onChange={e => setUserRegister(
+                    {...userRegister, confirmPassword: e.target.value})}
                     required
                   />
                 </div>
-                <Button className="w-full bg-primary font-medium py-3 mt-5">Create Account</Button>
+                <Button
+                  type="button"
+                  className="w-full bg-primary font-medium py-3 mt-5"
+                  onClick={onSignupClick}>
+                  Create Account
+                </Button>
               </form>
               <Separator className="bg-[#40444b]" />
               <div className="text-center text-sm text-[#72767d]">
                 Alrealdy have a account?{" "}
-                <a href="#" className="text-[#00aff4] hover:underline">
+                <Link
+                  to={"/login"} 
+                  className="text-[#00aff4] hover:underline">
                   Login
-                </a>
+                </Link>
               </div>
             </CardContent>
           </Card>
